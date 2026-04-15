@@ -102,13 +102,22 @@ def create_model_comparison_plots(metrics_df, figures_dir):
     create_metric_bar_plot(metrics_df, "r2", figures_dir / "model_comparison_r2.png")
     
 def create_feature_importance_plot(data, model_name, path):
+    feature_name_map = {
+        "rainfall_mm": "Rainfall",
+        "storm_duration_hr": "Storm duration",
+        "impervious_frac": "Impervious fraction",
+        "infiltration_index": "Infiltration index",
+        "runoff_coefficient_proxy": "Runoff coefficient",
+    }
+
+    data = data.copy()
+    data["feature"] = data["feature"].replace(feature_name_map)
     data = data.sort_values("importance", ascending=True)
 
     plt.figure(figsize=(6, 3.5))
     bars = plt.barh(data["feature"], data["importance"])
 
     plt.xlabel("Importance")
-    # plt.ylabel("Feature")
     plt.xlim(0, data["importance"].max() * 1.25)
 
     for bar, val in zip(bars, data["importance"].values):

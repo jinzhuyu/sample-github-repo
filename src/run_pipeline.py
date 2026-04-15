@@ -167,7 +167,7 @@ def main():
     print("Pipeline finished successfully.")
     print(f"Best model: {best_model_name}")
     print(metrics_df.to_string(index=False))
-
+    
 
 if __name__ == "__main__":
     main()
