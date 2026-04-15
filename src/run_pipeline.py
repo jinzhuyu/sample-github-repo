@@ -1,56 +1,48 @@
-from __future__ import annotations
-
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-import pandas as pd
+from make_dataset import load_data as load_raw_data, process_data, save_data
+from make_plots import create_parity_plot, create_residual_plot
+from model import evaluate, make_predictions, save_result, train
 
-from evaluate_model import evaluate_and_save_results
-from make_dataset import process_raw_dataset
-from utils import FIGURES_DIR
 
-def create_parity_plot(predictions_df: pd.DataFrame, output_path: Path) -> None:
-    observed = predictions_df["observed_peak_flow_cms"]
-    predicted = predictions_df["predicted_peak_flow_cms"]
+def run_pipeline():
+    raw_path = "../data/raw_data/stormwater_events_sample.csv"
+    processed_path = "../data/processed_data/stormwater_events_features.csv"
+    metrics_path = "../output/metrics.csv"
+    predictions_path = "../output/predictions.csv"
+    figures_dir = Path("../output/figures")
 
-    plt.figure(figsize=(6, 4.5))
-    plt.scatter(observed, predicted, alpha=0.75)
-    lower = min(observed.min(), predicted.min())
-    upper = max(observed.max(), predicted.max())
-    plt.plot([lower, upper], [lower, upper], linestyle="--")
-    plt.xlabel("Observed peak flow (cms)")
-    plt.ylabel("Predicted peak flow (cms)")
-    plt.title("Parity plot: observed vs predicted peak flow")
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=200)
-    plt.close()
+    raw_df = load_raw_data(raw_path)
+    if raw_df is None:
+        return None, None
 
-def create_residual_plot(predictions_df: pd.DataFrame, output_path: Path) -> None:
-    predicted = predictions_df["predicted_peak_flow_cms"]
-    residual = predictions_df["observed_peak_flow_cms"] - predictions_df["predicted_peak_flow_cms"]
+    processed_df = process_data(raw_df)
+    save_data(processed_df, processed_path)
 
-    plt.figure(figsize=(6, 4.5))
-    plt.scatter(predicted, residual, alpha=0.75)
-    plt.axhline(0, linestyle="--")
-    plt.xlabel("Predicted peak flow (cms)")
-    plt.ylabel("Residual (observed - predicted)")
-    plt.title("Residual plot")
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=200)
-    plt.close()
+    model, x_test, y_test = train(processed_df)
+    y_pred = model.predict(x_test)
 
-def run_pipeline() -> tuple[pd.DataFrame, pd.DataFrame]:
-    process_raw_dataset()
-    metrics_df, predictions_df = evaluate_and_save_results()
-    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
-    create_parity_plot(predictions_df, FIGURES_DIR / "parity_plot.png")
-    create_residual_plot(predictions_df, FIGURES_DIR / "residual_plot.png")
-    return metrics_df, predictions_df
+    metrics = evaluate(y_test, y_pred)
+    predictions = make_predictions(x_test, y_test, y_pred)
 
-def main() -> None:
-    metrics_df, _ = run_pipeline()
+    save_result(metrics, metrics_path)
+    save_result(predictions, predictions_path)
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    create_parity_plot(predictions, figures_dir / "parity_plot.png")
+    create_residual_plot(predictions, figures_dir / "residual_plot.png")
+
+    return metrics, predictions
+
+
+def main():
+    metrics, _ = run_pipeline()
+    if metrics is None:
+        return
+
     print("Pipeline finished successfully.")
-    print(metrics_df.to_string(index=False))
+    print(metrics.to_string(index=False))
+
 
 if __name__ == "__main__":
     main()
