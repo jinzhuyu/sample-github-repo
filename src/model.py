@@ -197,4 +197,4 @@ def train_and_compare(df):
     best_model = fitted_models[best_model_name]
     best_predictions_df = prediction_tables[best_model_name].reset_index(drop=True)
 
-    return metrics_df, predictions_df, best_model_name, best_model, best_predictions_df
+    return (metrics_df, predictions_df, best_model_name, best_model, best_predictions_df, fitted_models,)

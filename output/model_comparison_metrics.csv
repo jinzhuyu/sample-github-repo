@@ -1,5 +1,5 @@
 mae,rmse,r2,n_test,model,best_params
-1.4396297981238195,1.7924322395183996,0.8515741482690193,48,ridge,{'model__alpha': 0.1}
-1.5654700444067238,2.0544719887355534,0.8050045377500611,48,svr,"{'model__C': 10.0, 'model__epsilon': 0.1, 'model__kernel': 'rbf'}"
-1.7795034216977819,2.1419475006626336,0.7880459593145674,48,random_forest,"{'model__max_depth': 5, 'model__min_samples_split': 5, 'model__n_estimators': 300}"
-1.7818960290749868,2.144442721443368,0.7875518480663222,48,xgboost,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__subsample': 0.8}"
+4.775083948189185,5.745978005816729,0.8935982907200328,48,random_forest,"{'model__max_depth': 10, 'model__min_samples_split': 2, 'model__n_estimators': 200}"
+4.800806957642237,5.98821622327409,0.8844378446828381,48,xgboost,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__subsample': 1.0}"
+6.733843426043468,10.597899520879672,0.6380402484917621,48,svr,"{'model__C': 10.0, 'model__epsilon': 0.5, 'model__kernel': 'rbf'}"
+6.992372273891768,10.894184833037789,0.6175187369986985,48,ridge,{'model__alpha': 1.0}

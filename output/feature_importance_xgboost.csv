@@ -1,0 +1,6 @@
+feature,importance
+rainfall_mm,0.33273506
+storm_duration_hr,0.49497172
+impervious_frac,0.028112475
+infiltration_index,0.027551658
+runoff_coefficient_proxy,0.11662909
