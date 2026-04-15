@@ -125,7 +125,3 @@ The repository already shows typical output artifacts, including metrics files, 
 ## Supporting documentation
 
 The `doc/` folder includes a repository checklist, a suggested workflow, and a report template. Those files emphasize modular scripts, data documentation, reproducibility, and storing final deliverables in the documentation/report area. 
-
-## License
-
-MIT License. 
