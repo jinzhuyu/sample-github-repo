@@ -1,14 +1,23 @@
-# This file contains the main modeling code for training and evaluating a Ridge regression model on stormwater event data.
-from __future__ import annotations # imported to enable future annotations for better type hinting and code clarity.
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
+from sklearn.svm import SVR
+
+try:
+    from xgboost import XGBRegressor
+except ImportError as e:
+    raise ImportError(
+        "xgboost is required for this pipeline. Install it with: pip install xgboost"
+    ) from e
 
 
 def load_data(path):
@@ -29,8 +38,8 @@ def save_result(data, path):
 
 def get_features():
     return [
-        "rainfall_depth_mm",
-        "duration_min",
+        "rainfall_mm",
+        "storm_duration_hr",
         "impervious_frac",
         "infiltration_index",
         "runoff_coefficient_proxy",
@@ -41,7 +50,21 @@ def get_target():
     return "peak_flow_cms"
 
 
-def build_model(features):
+def split_data(df):
+    features = get_features()
+    target = get_target()
+
+    required = features + [target]
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        raise KeyError(f"Missing columns: {missing}")
+
+    X = df[features]
+    y = df[target]
+    return train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+def build_preprocessor(features):
     numeric = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="median")),
@@ -49,65 +72,129 @@ def build_model(features):
         ]
     )
 
-    preprocessor = ColumnTransformer(
+    return ColumnTransformer(
         transformers=[("num", numeric, features)]
     )
 
-    return Pipeline(
-        steps=[
-            ("preprocessor", preprocessor),
-            ("model", Ridge(alpha=1.0)),
-        ]
-    )
+
+def build_searches(features):
+    preprocessor = build_preprocessor(features)
+
+    searches = {
+        "ridge": GridSearchCV(
+            estimator=Pipeline(
+                steps=[
+                    ("preprocessor", preprocessor),
+                    ("model", Ridge()),
+                ]
+            ),
+            param_grid={
+                "model__alpha": [0.1, 1.0, 10.0],
+            },
+            scoring="neg_root_mean_squared_error",
+            cv=3,
+            n_jobs=-1,
+        ),
+        "svr": GridSearchCV(
+            estimator=Pipeline(
+                steps=[
+                    ("preprocessor", preprocessor),
+                    ("model", SVR()),
+                ]
+            ),
+            param_grid={
+                "model__C": [0.1, 1.0, 10.0],
+                "model__epsilon": [0.1, 0.5, 1.0],
+                "model__kernel": ["rbf"],
+            },
+            scoring="neg_root_mean_squared_error",
+            cv=3,
+            n_jobs=-1,
+        ),
+        "random_forest": GridSearchCV(
+            estimator=Pipeline(
+                steps=[
+                    ("preprocessor", preprocessor),
+                    ("model", RandomForestRegressor(random_state=42)),
+                ]
+            ),
+            param_grid={
+                "model__n_estimators": [100, 200, 300],
+                "model__max_depth": [3, 5, 10],
+                "model__min_samples_split": [2, 5],
+            },
+            scoring="neg_root_mean_squared_error",
+            cv=3,
+            n_jobs=-1,
+        ),
+        "xgboost": GridSearchCV(
+            estimator=Pipeline(
+                steps=[
+                    ("preprocessor", preprocessor),
+                    (
+                        "model",
+                        XGBRegressor(
+                            objective="reg:squarederror",
+                            random_state=42,
+                            n_estimators=200,
+                        ),
+                    ),
+                ]
+            ),
+            param_grid={
+                "model__max_depth": [3, 5, 10],
+                "model__learning_rate": [0.05, 0.1],
+                "model__subsample": [0.8, 1.0],
+            },
+            scoring="neg_root_mean_squared_error",
+            cv=3,
+            n_jobs=-1,
+        ),
+    }
+
+    return searches
 
 
-def split_data(df):
-    X = df[get_features()]
-    y = df[get_target()]
-    return train_test_split(X, y, test_size=0.2, random_state=123)
-
-
-def train(df):
-    X_train, X_test, y_train, y_test = split_data(df)
-    model = build_model(get_features())
-    model.fit(X_train, y_train)
-    return model, X_test, y_test
-
-
-def evaluate(y_true, y_pred):
-    return pd.DataFrame([{
+def evaluate_predictions(y_true, y_pred):
+    return {
         "mae": mean_absolute_error(y_true, y_pred),
         "rmse": float(np.sqrt(mean_squared_error(y_true, y_pred))),
         "r2": r2_score(y_true, y_pred),
         "n_test": len(y_true),
-    }])
+    }
 
 
-def make_predictions(X, y, y_pred):
-    df = X.copy()
-    df["observed_peak_flow_cms"] = y.values
-    df["predicted_peak_flow_cms"] = y_pred
-    return df
+def train_and_compare(df):
+    X_train, X_test, y_train, y_test = split_data(df)
+    searches = build_searches(get_features())
 
+    metrics_rows = []
+    prediction_tables = {}
+    fitted_models = {}
 
-def main():
-    data_path = "../data/processed_data/stormwater_events_features.csv"
-    metrics_path = "../output/metrics.csv"
-    predictions_path = "../output/predictions.csv"
+    for name, search in searches.items():
+        search.fit(X_train, y_train)
+        best_model = search.best_estimator_
+        y_pred = best_model.predict(X_test)
 
-    df = load_data(data_path)
-    if df is None:
-        return
+        metrics = evaluate_predictions(y_test, y_pred)
+        metrics["model"] = name
+        metrics["best_params"] = str(search.best_params_)
+        metrics_rows.append(metrics)
 
-    model, X_test, y_test = train(df)
-    y_pred = model.predict(X_test)
+        pred_df = X_test.copy()
+        pred_df["observed_peak_flow_cms"] = y_test.values
+        pred_df["predicted_peak_flow_cms"] = y_pred
+        pred_df["model"] = name
 
-    metrics = evaluate(y_test, y_pred)
-    preds = make_predictions(X_test, y_test, y_pred)
+        prediction_tables[name] = pred_df
+        fitted_models[name] = best_model
 
-    save_result(metrics, metrics_path)
-    save_result(preds, predictions_path)
+    metrics_df = pd.DataFrame(metrics_rows).sort_values("rmse").reset_index(drop=True)
+    predictions_df = pd.concat(prediction_tables.values(), ignore_index=True)
 
+    best_model_name = metrics_df.loc[0, "model"]
+    best_model = fitted_models[best_model_name]
+    best_predictions_df = prediction_tables[best_model_name].reset_index(drop=True)
 
-if __name__ == "__main__":
-    main()
+    return metrics_df, predictions_df, best_model_name, best_model, best_predictions_df
