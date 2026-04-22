@@ -9,7 +9,7 @@ This repository demonstrates a simple end-to-end machine learning pipeline for s
 1. generate synthetic stormwater event data,
 2. preprocess the dataset and add engineered features,
 3. train and evaluate a Ridge regression model for peak-flow prediction, and
-4. create diagnostic figures from predictions. 
+4. create diagnostic figures from predictions. 
 
 ## Repository structure
 
