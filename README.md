@@ -1,6 +1,4 @@
-# sample-github-repo
-
-A small, instructional Githubrepository for a stormwater analytics workflow. The project generates a synthetic storm-event dataset, performs light feature engineering, trains a regression model to predict peak flow, and saves evaluation outputs and plots.  
+This is a small, instructional GitHub repository for a stormwater analytics workflow. The project generates a synthetic storm-event dataset, performs light feature engineering, trains multiple regression models to predict peak flow, and saves evaluation outputs and plots.  
 
 ## Project purpose
 
