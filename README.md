@@ -112,7 +112,7 @@ python src/generate_raw_data.py
 python src/process_data.py
 ```
 
-### 3. Train and evaluate the model and then generate plots
+### 3. Train and evaluate the model and then generate plots about model accuracy and feature importance
 
 ```bash
 python src/run_pipeline.py
