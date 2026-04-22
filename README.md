@@ -49,13 +49,37 @@ sample-github-repo/
 
 ### `src/generate_raw_data.py`
 
+<<<<<<< HEAD
 Generates a synthetic event-level dataset and saves it to:
+=======
+Generates a synthetic event-level dataset using NumPy random draws and saves it to `../data/raw_data/stormwater_events_sample.csv`. Variables include rainfall amount, storm duration, impervious fraction, catchment area, infiltration index, slope, peak flow, and time to peak. 
+>>>>>>> d5c7f19d01fdcc2afab7fa3b563468d5e3c76329
 
 ```text
 ../data/raw_data/stormwater_events_sample.csv
 ```
 
 The generated variables are:
+Loads a CSV file, adds a single engineered feature called `runoff_coefficient_proxy`, and writes the processed dataset to `../data/processed_data/stormwater_events_features.csv`. 
+
+### `src/model.py`
+
+Builds a scikit-learn pipeline with median imputation, standardization, and Ridge regression. It trains on the processed dataset, evaluates predictions using MAE, RMSE, and R², and saves metrics and predictions to the `output/` folder. 
+
+### `src/make_plots.py`
+
+Creates parity plots, residual plots, model-comparison bar charts, and feature-importance charts using Matplotlib. The plotting utilities save both PNG and PDF versions of figures. 
+
+### `src/run_pipeline.py`
+
+Intended to orchestrate preprocessing, training, evaluation, and plotting in one place. It reads raw data, processes features, trains the model, saves metrics and predictions, and generates diagnostic plots. 
+
+## Data overview
+
+According to `data/data_README.md`, the repository separates raw and processed data to support transparency and reproducibility. That document describes the project data as synthetic stormwater-event observations and identifies a raw dataset and a processed, feature-engineered dataset. 
+
+The code in `generate_raw_data.py` shows the raw synthetic data fields currently produced:
+>>>>>>> d5c7f19d01fdcc2afab7fa3b563468d5e3c76329
 
 - `event_id`
 - `storm_duration_hr`
