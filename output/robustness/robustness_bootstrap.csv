@@ -1,0 +1,6 @@
+mae,rmse,r2,n_test,best_params,check,bootstrap_id
+2.4291662847468483,3.0709848186308872,0.873566287626364,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",bootstrap,0
+2.7752042623746065,3.6192872494315047,0.9480247514278669,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",bootstrap,1
+2.971813286921359,3.959071188097077,0.9099450453666247,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",bootstrap,2
+3.5115483224598294,4.792358587975161,0.9303144220387662,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",bootstrap,3
+3.1818037163879844,4.999939288745352,0.9181995768240965,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",bootstrap,4

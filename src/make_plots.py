@@ -132,3 +132,166 @@ def create_feature_importance_plot(data, model_name, path):
     plt.savefig(path, dpi=400)
     plt.savefig(path.with_suffix(".pdf"), dpi=250)
     plt.close()
+    
+def summarize_for_plot(data, x_col):
+    """Compute mean and std of RMSE for a plotting variable."""
+    return (
+        data.groupby(x_col, as_index=False)
+        .agg(
+            mean_rmse=("rmse", "mean"),
+            std_rmse=("rmse", "std"),
+        )
+        .sort_values(x_col)
+    )
+
+
+def create_data_size_robustness_plot(data, path):
+    """
+    Expected columns:
+        - train_fraction
+        - rmse
+    """
+    plot_data = summarize_for_plot(data, "train_fraction")
+
+    plt.figure(figsize=(5, 4))
+    plt.errorbar(
+        plot_data["train_fraction"],
+        plot_data["mean_rmse"],
+        yerr=plot_data["std_rmse"],
+        marker="o",
+        capsize=4,
+    )
+
+    plt.xlabel("Training data fraction")
+    plt.ylabel("RMSE")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=400)
+    plt.savefig(path.with_suffix(".pdf"), dpi=250)
+    plt.close()
+
+
+def create_missing_data_robustness_plot(data, path):
+    """
+    Expected columns:
+        - missing_rate
+        - rmse
+    """
+    plot_data = summarize_for_plot(data, "missing_rate")
+
+    plt.figure(figsize=(5, 4))
+    plt.errorbar(
+        plot_data["missing_rate"],
+        plot_data["mean_rmse"],
+        yerr=plot_data["std_rmse"],
+        marker="o",
+        capsize=4,
+    )
+
+    plt.xlabel("Missing data fraction")
+    plt.ylabel("RMSE")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=400)
+    plt.savefig(path.with_suffix(".pdf"), dpi=250)
+    plt.close()
+
+
+def create_perturbation_robustness_plot(data, path):
+    """
+    Expected columns:
+        - noise_scale_sd_units
+        - rmse
+    """
+    plot_data = summarize_for_plot(data, "noise_scale_sd_units")
+
+    plt.figure(figsize=(5, 4))
+    plt.errorbar(
+        plot_data["noise_scale_sd_units"],
+        plot_data["mean_rmse"],
+        yerr=plot_data["std_rmse"],
+        marker="o",
+        capsize=4,
+    )
+
+    plt.xlabel("Noise scale (SD units)")
+    plt.ylabel("RMSE")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=400)
+    plt.savefig(path.with_suffix(".pdf"), dpi=250)
+    plt.close()
+
+
+def create_bootstrap_robustness_boxplot(data, path):
+    """
+    Expected columns:
+        - rmse
+    """
+    plt.figure(figsize=(5, 4))
+    plt.boxplot(
+        data["rmse"].dropna().values,
+        tick_labels=["Random Forest"],
+    )
+
+    plt.ylabel("RMSE")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=400)
+    plt.savefig(path.with_suffix(".pdf"), dpi=250)
+    plt.close()
+
+
+def create_bootstrap_robustness_histogram(data, path):
+    """
+    Expected columns:
+        - rmse
+    """
+    plt.figure(figsize=(5, 4))
+    plt.hist(
+        data["rmse"].dropna(),
+        bins=20,
+        alpha=0.7,
+    )
+
+    plt.xlabel("RMSE")
+    plt.ylabel("Frequency")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=400)
+    plt.savefig(path.with_suffix(".pdf"), dpi=250)
+    plt.close()
+
+
+def create_all_robustness_plots(
+    data_size_df,
+    missing_data_df,
+    perturbation_df,
+    bootstrap_df,
+    figures_dir,
+):
+    create_data_size_robustness_plot(
+        data_size_df,
+        figures_dir / "robustness_data_size_rmse.png",
+    )
+    create_missing_data_robustness_plot(
+        missing_data_df,
+        figures_dir / "robustness_missing_data_rmse.png",
+    )
+    create_perturbation_robustness_plot(
+        perturbation_df,
+        figures_dir / "robustness_perturbation_rmse.png",
+    )
+    create_bootstrap_robustness_boxplot(
+        bootstrap_df,
+        figures_dir / "robustness_bootstrap_boxplot.png",
+    )
+    create_bootstrap_robustness_histogram(
+        bootstrap_df,
+        figures_dir / "robustness_bootstrap_histogram.png",
+    )

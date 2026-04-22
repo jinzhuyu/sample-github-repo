@@ -1,0 +1,13 @@
+mae,rmse,r2,n_test,best_params,check,train_fraction,sample_n,repeat
+7.424368265268616,10.41469984677159,-0.020661119382957782,20,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.4,96,0
+5.609292194785945,8.313434725550774,0.5346638713554916,20,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.4,96,1
+4.250075428350329,5.487112794490542,0.7752041960302231,20,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.4,96,2
+6.131976699760542,8.516243374568237,0.7092189763641431,29,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.6,144,0
+3.806382534048888,4.930593950612593,0.7681483239933689,29,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.6,144,1
+4.709587804430888,5.93367625054474,0.8779051253374054,29,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.6,144,2
+4.3123783323723215,5.4702958149773275,0.7196382415887326,39,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.8,192,0
+3.508541644806186,4.410613342736855,0.8857107630980469,39,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.8,192,1
+3.485956685214975,4.797254872046845,0.9178238978526292,39,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,0.8,192,2
+3.6804717152674997,4.378466365091373,0.8788701897046376,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,1.0,240,0
+4.69048333421587,5.878177790120904,0.8919297485037959,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,1.0,240,1
+3.933656909906866,4.987981013453964,0.9192528644382169,48,"{'model__max_depth': 7, 'model__min_samples_split': 2, 'model__n_estimators': 300}",data_size,1.0,240,2
