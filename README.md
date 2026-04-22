@@ -1,4 +1,8 @@
-This is an instructional GitHub repository for a sample applied macheine learning project. The project generates a synthetic storm-event dataset, performs light feature engineering, trains and compares multiple regression models to predict peak flow, and saves evaluation outputs, robustness-check results, and plots.
+# Stormwater ML Workflow Repository
+
+This is an instructional GitHub repository for a sample applied machine learning project in stormwater analytics. The project generates a synthetic storm-event dataset, performs light feature engineering, trains and compares multiple regression models to predict peak flow, and saves evaluation outputs, robustness-check results, and plots.
+
+The repository is designed for teaching and demonstration rather than production deployment. Its main value is to show a clear, reproducible end-to-end workflow that starts from data generation and ends with model evaluation, visualization, and robustness analysis.
 
 ## Project purpose
 
@@ -9,6 +13,19 @@ This repository demonstrates a simple end-to-end machine learning workflow for s
 3. train and compare several regression models for peak-flow prediction,
 4. create diagnostic and feature-importance plots for the best-performing models, and
 5. evaluate model robustness under reduced data size, missing data, perturbed inputs, and bootstrap resampling.
+
+## Workflow diagram
+
+```mermaid
+flowchart TD
+    A[Generate synthetic raw data\n`src/generate_raw_data.py`] --> B[Process raw data and add\nengineered feature\n`src/process_data.py`]
+    B --> C[Train and compare models\n`src/model.py`]
+    C --> D[Save metrics, predictions,\nand feature importance tables]
+    C --> E[Generate diagnostic figures\n`src/plot_accuracy_features.py`]
+    C --> F[Run robustness checks\n`src/robustness_checks.py`]
+    E --> G[Accuracy figures\n`output/accuracy/figures/`]
+    F --> H[Robustness summaries and figures\n`output/robustness/figures/`]
+```
 
 ## Repository structure
 
@@ -49,37 +66,13 @@ sample-github-repo/
 
 ### `src/generate_raw_data.py`
 
-<<<<<<< HEAD
 Generates a synthetic event-level dataset and saves it to:
-=======
-Generates a synthetic event-level dataset using NumPy random draws and saves it to `../data/raw_data/stormwater_events_sample.csv`. Variables include rainfall amount, storm duration, impervious fraction, catchment area, infiltration index, slope, peak flow, and time to peak. 
->>>>>>> d5c7f19d01fdcc2afab7fa3b563468d5e3c76329
 
 ```text
 ../data/raw_data/stormwater_events_sample.csv
 ```
 
 The generated variables are:
-Loads a CSV file, adds a single engineered feature called `runoff_coefficient_proxy`, and writes the processed dataset to `../data/processed_data/stormwater_events_features.csv`. 
-
-### `src/model.py`
-
-Builds a scikit-learn pipeline with median imputation, standardization, and Ridge regression. It trains on the processed dataset, evaluates predictions using MAE, RMSE, and R², and saves metrics and predictions to the `output/` folder. 
-
-### `src/make_plots.py`
-
-Creates parity plots, residual plots, model-comparison bar charts, and feature-importance charts using Matplotlib. The plotting utilities save both PNG and PDF versions of figures. 
-
-### `src/run_pipeline.py`
-
-Intended to orchestrate preprocessing, training, evaluation, and plotting in one place. It reads raw data, processes features, trains the model, saves metrics and predictions, and generates diagnostic plots. 
-
-## Data overview
-
-According to `data/data_README.md`, the repository separates raw and processed data to support transparency and reproducibility. That document describes the project data as synthetic stormwater-event observations and identifies a raw dataset and a processed, feature-engineered dataset. 
-
-The code in `generate_raw_data.py` shows the raw synthetic data fields currently produced:
->>>>>>> d5c7f19d01fdcc2afab7fa3b563468d5e3c76329
 
 - `event_id`
 - `storm_duration_hr`
@@ -91,6 +84,8 @@ The code in `generate_raw_data.py` shows the raw synthetic data fields currently
 - `peak_flow_cms`
 - `time_to_peak_min`
 
+This script is useful for demonstrating the workflow when real field observations are unavailable or when a lightweight instructional example is preferred.
+
 ### `src/process_data.py`
 
 Loads the raw dataset, adds one engineered feature called `runoff_coefficient_proxy`, and saves the processed dataset to:
@@ -98,6 +93,8 @@ Loads the raw dataset, adds one engineered feature called `runoff_coefficient_pr
 ```text
 ../data/processed_data/stormwater_events_features.csv
 ```
+
+This step separates raw data generation from feature preparation, which makes the workflow easier to understand, debug, and reproduce.
 
 ### `src/model.py`
 
@@ -123,6 +120,8 @@ It saves outputs to:
 ../output/accuracy/feature_importance_random_forest.csv
 ../output/accuracy/feature_importance_xgboost.csv
 ```
+
+This script is the core modeling component of the repository. It supports side-by-side comparison of multiple regression approaches rather than focusing on a single model only.
 
 ### `src/make_plots.py`
 
@@ -172,6 +171,8 @@ By default, outputs are saved under:
 ## Data overview
 
 The raw synthetic dataset contains storm-event variables such as rainfall, storm duration, imperviousness, infiltration index, slope, peak flow, and time to peak. The processed dataset adds one engineered predictor, `runoff_coefficient_proxy`, for downstream modeling.
+
+Because the dataset is synthetic, the repository is well suited for instruction, code testing, and workflow demonstration. However, results should not be interpreted as field-validated findings.
 
 ## Installation
 
@@ -267,7 +268,9 @@ After running the full workflow, the repository should contain outputs such as:
 
 ## Notes
 
-- The scripts use relative paths like `../data/...` and `../output/...`, so they are intended to be run from the `src/` folder structure shown above while keeping the repository layout unchanged.
+- The scripts use relative paths like `../data/...` and `../output/...`, so the repository structure should remain unchanged.
+- For the smoothest execution, run commands from the repository root unless the scripts are explicitly written for another working directory.
+- If some optional outputs are missing, check whether the corresponding upstream script completed successfully.
 
 ## Supporting documentation
 
